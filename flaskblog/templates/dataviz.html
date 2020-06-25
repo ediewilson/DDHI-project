@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>Data Visualizations</h1>
+    <p>This is the page for place name data visualizations.</p>
+    <div>
+        <h5>Instructions:</h5>
+        <p>
+            Upload your .csv file, which should look something like this...
+        </p>
+        <img src='../static/img/example1.png' alt="Missing" hieght="600" width="600" />
+        <p>This file will then be availible for download with the information filled in by the existing DDHI coordinate definitions. If there is a place in your file that is not already in our database, you'll be redirected to a form and instructed to fill out the information for a new place.</p>
+    </div>
+    <form action = "http://localhost:5000/uploader" method = "POST" 
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" /> <br /> <br />
+         <input class="btn btn-outline-info" type = "submit"/>
+         <br />
+      </form>
+{% endblock content %}
