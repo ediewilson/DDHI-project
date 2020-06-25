@@ -1,7 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, send_file
 from flaskblog import bcrypt, app, db
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PlaceVizForm, NewPlaceForm, FileNameForm
 from flaskblog.models import User, Place
@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 # Global variables for the script 
 found = False
 places = []
-current = ""
+finalFileName = ""
 
 # method to find "*,*" pattern in .csv files (Hanover, NH = "Hanover, NH" and we don't want to split that by comma)
 # if first char in a string is ", search through the next fields to find the next one, concatenate as we go
@@ -135,7 +135,7 @@ def home():
 
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
-    global places, current
+    global places
 
     if request.method == 'POST':
         f = request.files['file']
@@ -236,7 +236,7 @@ def account():
 
 @app.route("/newPlace", methods=['GET', 'POST'])
 def newPlace():
-    global places, current
+    global places, finalFileName
     newPlaces = []
 
     form = NewPlaceForm()
@@ -279,13 +279,27 @@ def newPlace():
     # RETURN THE DATAVIZ PAGE WHEN WE GET TO THE END
     if form.validate_on_submit():
         fileName = form.newFileName.data
-        
-        outFile = open(fileName+'_placeNameViz.csv', "w")
+        finalFileName = fileName+'_placeNameViz.csv'
+
+        outFile = open(finalFileName, "w")
         outFile.write("name,address,city,latitude,longitude,source\n")
         
         for place in newPlaces:
             qResult = Place.query.filter_by(name=place).first()
             outFile.write(qResult.toString()+"\n")
 
+        outFile.close()
 
     return render_template('download.html', form=form, title='Complete')
+
+
+@app.route('/return-files/')
+def return_files_tut():
+    global finalFileName
+    
+    # TODO : Fix error [Errno 21] Is a directory: '/Users/ediewilson/spwa-server/flaskblog/'
+
+    try:
+        return send_file(finalFileName)
+    except Exception as e:
+        return str(e)
