@@ -25,6 +25,8 @@ class Place(db.Model):
     source = db.Column(db.String(100),nullable=True)
 
     def __repr__(self):
-        return ("Place ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')".format(self.name, self.address, self.city, self.latitude, self.longitude, self.source))
+        return ("{0},{1},{2},{3},{4},{5}".format(self.name, self.address, self.city, self.latitude, self.longitude, self.source))
 
+    def toString(self):
+        return ("{0},{1},{2},{3},{4},{5}".format(self.name, self.address, self.city, self.latitude, self.longitude, self.source))
    

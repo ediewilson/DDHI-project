@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from flaskblog import bcrypt, app, db
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PlaceVizForm, NewPlaceForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PlaceVizForm, NewPlaceForm, FileNameForm
 from flaskblog.models import User, Place
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
@@ -142,34 +142,6 @@ def upload_file():
         f.save(secure_filename(f.filename))
     # readFile puts all of the placenames in the file in an array called places
         readFile(f.filename)
-    
-    # outFile should do redirects to the placeAdd form
-    # THE CODE FOR OUTFILE IS BELOW
-    #    outputFile(): 
-        #newPlaces = []
-
-        ## ADD THIS CODE TO THE NEWPLACE ROUTE SO THE ITERATION HAPPENS THERE
-        #for place in places:
-         #   qResult = Place.query.filter_by(name=place).first()
-          #  if qResult:
-           #     newPlaces.append(qResult)
-            #    print("In new place:")
-             #   # print(newPlaces)
-              #  return redirect(url_for('upload_file'))
-            #else: 
-            #    print("Trying to redirect...")
-            #    current = place
-            #    return redirect(url_for('newPlace'))
-
-        # Deal with outputting new file needs to be done differently 
-        
-        ##### Need to add this to the form somehow
-        #fileName = input("Name for your output file (include the .csv)")
-        
-        #outFile = open('output_test.csv', "w")
-        #outFile.write("name,address,city,latitude,longitude,source\n")
-        #for place in newPlaces:
-        #    outFile.write(place + "\n")
         
         print("Process COMPLETE")
         return redirect(url_for('newPlace'))
@@ -268,31 +240,9 @@ def newPlace():
     newPlaces = []
 
     form = NewPlaceForm()
-##CODE FROM UPLOADER
-    #for place in places:
-    #    print("Start of FOR LOOP:" +place)
-    #    qResult = Place.query.filter_by(name=place).first()
-    #    if qResult:
-    #        newPlaces.append(qResult)
-    #        print("In new place:")
-    #        print(newPlaces)
-    
-    #    else: 
-    #        print("Trying to redirect...")
-                    
-    #        if form.validate_on_submit():
-    #            newPlace = Place(name=place, address=form.address.data, city=form.city.data, latitude=form.latitude.data, longitude=form.longitude.data, source=form.source.data)
-    #            print(newPlace)
-    #            db.session.add(newPlace)
-    #            db.session.commit() 
-    #            print("*******Committed*********")
-    #            flash('Place added', 'success')
-    #            newPlaces.append(newPlace)
-        
-            
-    #        return render_template('placeAdd.html', title='New Place', form=form, current_place=place)
 
-# TODO
+# TODO: Make this work
+
     i = 0
     while i < len(places):
         print("Start of WHILE LOOP:" +places[i])
@@ -301,29 +251,41 @@ def newPlace():
             print("In IF")
             print(qResult)
             i += 1
-            #newPlaces.append(qResult)
-            #print("In new place:")
-            #print(newPlaces)
-    
+           
         else: 
-            please = True
             print("In ELSE...")      
-            while please:
-                if form.validate_on_submit():
-                    newPlace = Place(name=places[i], address=form.address.data, city=form.city.data, latitude=form.latitude.data, longitude=form.longitude.data, source=form.source.data)
-                    print(newPlace)
-                    db.session.add(newPlace)
-                    db.session.commit() 
-                    print("*******Committed*********")
-                    flash(places[i]+ 'added', 'success')
-                    i = 0
-                    flash('Place added', 'success')
-                    please = False
         
-            return render_template('placeAdd.html', title='New Place', form=form, current_place=places[i])       
+            if form.validate_on_submit():
+                newPlace = Place(name=places[i], address=form.address.data, city=form.city.data, latitude=form.latitude.data, longitude=form.longitude.data, source=form.source.data)
+                print(newPlace)
+                db.session.add(newPlace)
+                db.session.commit() 
+                print("*******Committed*********")
+                flash(places[i]+ ' added', 'success')
+                i = 0
+                return redirect(url_for('newPlace'))
+
+            return render_template('placeAdd.html', title='New Place', form=form, current_place=places[i]) 
+                    
+        
+            #return render_template('placeAdd.html', title='New Place', form=form, current_place=places[i])       
 
     for place in places:
         newPlaces.append(place)
         print("Added " +place)
+
+    flash('One last step...', 'success')
+    form = FileNameForm()
     # RETURN THE DATAVIZ PAGE WHEN WE GET TO THE END
-    return render_template('download.html', title='Complete')
+    if form.validate_on_submit():
+        fileName = form.newFileName.data
+        
+        outFile = open(fileName+'_placeNameViz.csv', "w")
+        outFile.write("name,address,city,latitude,longitude,source\n")
+        
+        for place in newPlaces:
+            qResult = Place.query.filter_by(name=place).first()
+            outFile.write(qResult.toString()+"\n")
+
+
+    return render_template('download.html', form=form, title='Complete')

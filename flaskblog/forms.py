@@ -70,3 +70,9 @@ class NewPlaceForm(FlaskForm):
     source =  StringField('Source', validators=[DataRequired()])
 
     submit = SubmitField('Add place')
+
+
+class FileNameForm(FlaskForm):
+    newFileName = StringField('Last name of interviewee', validators=[DataRequired()])
+    
+    submit = SubmitField('Done')
