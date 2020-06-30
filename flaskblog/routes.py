@@ -325,8 +325,6 @@ def newPlace():
 @app.route('/return-files/')
 def return_files_tut():
     global finalFileName
-    
-    # TODO : Fix error [Errno 21] Is a directory: '/Users/ediewilson/spwa-server/flaskblog/'
 
     try:
         print ("sending file")
