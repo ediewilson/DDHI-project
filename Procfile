@@ -1,2 +1,2 @@
-web: gunicorn gettingstarted.wsgi --log-file -
+web: gunicorn gettingstarted.flaskblog --log-file -
 app: flaskblog 
