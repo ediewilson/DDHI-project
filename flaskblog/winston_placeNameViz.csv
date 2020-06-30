@@ -1,0 +1,8 @@
+name,address,city,latitude,longitude,narrator,source
+Dartmouth,,"Hanover, NH",43.703757,-72.288889,None,Google Maps
+America,,,38.88953,-77.009305,None,Google Maps
+"Houston, Texas",,"Houston, TX",29.758035,-95.367314,None,Google Maps
+"Halifax, Nova Scotia",,"Halifax, NS",44.644946,-63.579684,None,Google Maps
+US,,,38.88953,-77.009305,None,Google Maps
+Vietnam,,,21.018786,105.833333,None,Google Maps
+New York City,,"New York City, NY",40.697149,-73.889078,None,Google Maps

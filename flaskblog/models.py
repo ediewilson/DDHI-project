@@ -22,11 +22,12 @@ class Place(db.Model):
     city = db.Column(db.String(100),nullable=True)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    narrator = db.Column(db.String(100))
     source = db.Column(db.String(100),nullable=True)
 
     def __repr__(self):
         return ("{0},{1},{2},{3},{4},{5}".format(self.name, self.address, self.city, self.latitude, self.longitude, self.source))
 
     def toString(self):
-        return ("{0},{1},{2},{3},{4},{5}".format(self.name, self.address, self.city, self.latitude, self.longitude, self.source))
+        return ("{0},{1},{2},{3},{4},{5},{6}".format(self.name, self.address, self.city, self.latitude, self.longitude, self.narrator,self.source))
    

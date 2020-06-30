@@ -107,7 +107,8 @@ def adminMode(fileName):
                 city = lineSplit[3]
                 latitude = lineSplit[4]
                 longitude = lineSplit[5]
-                source = lineSplit[6]
+                longitude = lineSplit[6]
+                source = lineSplit[7]
             else:
                 lineSplit = line.split(",")
                 placeName = lineSplit[0]
@@ -115,11 +116,14 @@ def adminMode(fileName):
                 city = lineSplit[2]
                 latitude = lineSplit[3]
                 longitude = lineSplit[4]
-                source = lineSplit[5]
+                narrator = lineSplit[5]
+                source = lineSplit[6]
             
             qResult = Place.query.filter_by(name=placeName).first()
             if qResult is None:
-                newPlace = Place(name=placeName, address=address, city=city, latitude=lttitude, longitude=longitude, source=source)
+                newPlace = Place(name=placeName, address=address, city=city, latitude=latitude, longitude=longitude, narrator=narrator, source=source)
+                db.session.add(newPlace)
+                db.session.commit() 
 
     inFile.close()
     return 'ok'
@@ -131,6 +135,15 @@ def adminMode(fileName):
 @app.route("/home")
 def home():
     return render_template('home.html')
+
+
+@app.route('/admin', methods = ['GET', 'POST'])
+def admin_mode():
+    global places
+    form = PlaceVizForm()
+    return render_template('admin.html', title='Admin', form=form)
+
+
 
 
 @app.route('/uploader', methods = ['GET', 'POST'])
@@ -145,6 +158,19 @@ def upload_file():
         
         print("Process COMPLETE")
         return redirect(url_for('newPlace'))
+
+
+@app.route('/uploader2', methods = ['GET', 'POST'])
+def upload_file2():
+    
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
+    # readFile puts all of the placenames in the file in an array called places
+        adminMode(f.filename)
+        
+        print("Process COMPLETE")
+        return redirect(url_for('home'))
 
 
 @app.route("/dataViz", methods=['GET', 'POST'])
@@ -256,7 +282,9 @@ def newPlace():
             print("In ELSE...")      
         
             if form.validate_on_submit():
-                newPlace = Place(name=places[i], address=form.address.data, city=form.city.data, latitude=form.latitude.data, longitude=form.longitude.data, source=form.source.data)
+                temp = cityTest(form.city.data)
+
+                newPlace = Place(name=places[i], address=form.address.data, city=temp, latitude=form.latitude.data, longitude=form.longitude.data, narrator=None, source=form.source.data)
                 print(newPlace)
                 db.session.add(newPlace)
                 db.session.commit() 
@@ -279,13 +307,14 @@ def newPlace():
     # RETURN THE DATAVIZ PAGE WHEN WE GET TO THE END
     if form.validate_on_submit():
         fileName = form.newFileName.data
-        finalFileName = fileName+'_placeNameViz.csv'
+        finalFileName = fileName + '_placeNameViz.csv'
 
-        outFile = open(finalFileName, "w")
-        outFile.write("name,address,city,latitude,longitude,source\n")
+        outFile = open('flaskblog/'+ finalFileName, "w")
+        outFile.write("name,address,city,latitude,longitude,narrator,source\n")
         
         for place in newPlaces:
             qResult = Place.query.filter_by(name=place).first()
+            newCity = Place(name=qResult.name, address=qResult.address, city=qResult.city, latitude=qResult.latitude, longitude=qResult.longitude, narrator=form.newFileName.data, source=qResult.source)
             outFile.write(qResult.toString()+"\n")
 
         outFile.close()
@@ -300,6 +329,8 @@ def return_files_tut():
     # TODO : Fix error [Errno 21] Is a directory: '/Users/ediewilson/spwa-server/flaskblog/'
 
     try:
-        return send_file(finalFileName)
+        print ("sending file")
+        return send_file(os.path.join(app.root_path, finalFileName), as_attachment=True, mimetype='text/csv')
+        
     except Exception as e:
         return str(e)
