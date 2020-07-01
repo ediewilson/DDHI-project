@@ -1,5 +1,6 @@
 import os
 import secrets
+import requests
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, send_file
 from flaskblog import bcrypt, app, db
@@ -332,3 +333,10 @@ def return_files_tut():
         
     except Exception as e:
         return str(e)
+
+
+
+def index(request):
+    r = requests.get('http://httpbin.org/status/418')
+    print(r.text)
+    return ('<pre>' + r.text + '</pre>')
