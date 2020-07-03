@@ -1,1 +1,1 @@
-web:gunicorn flaskblog.wgsi run: app
+web:gunicorn app:app
