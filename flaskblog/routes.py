@@ -335,7 +335,7 @@ def return_files_tut():
         return str(e)
 
 
-
+#index for downloading files 
 def index(request):
     r = requests.get('http://httpbin.org/status/418')
     print(r.text)
